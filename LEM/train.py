@@ -30,7 +30,7 @@ def show(imgT):
     plt.show()
 
 
-traindata_loader, valdata_loader=get_TraVal( refresh=False )
+traindata_loader, valdata_loader=get_TraVal( refresh=False, target_onehot=False)
 device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
@@ -53,14 +53,17 @@ def _run_learning(training=True,epoch=0):
 
 
 
-    for batch_idx, ( data, target, cn) in enumerate(dataloader):
+    for batch_idx, ( data, target) in enumerate(dataloader):
         #print(data.shape)#torch.Size([32, 3, 220, 330])
 
         batch_data=data.to(device)
         batch_label=target.to(device)
         
         prediction = model(batch_data)
-        loss = criterion(torch.sigmoid(prediction), batch_label)
+
+        #loss = criterion(torch.sigmoid(prediction), batch_label)
+        loss = criterion(prediction, batch_label)
+        
         print(torch.sigmoid(prediction))
 
         #loss = criterion(F.softmax(prediction,dim=1), batch_label)
@@ -86,7 +89,7 @@ def _run_learning(training=True,epoch=0):
 
 
 model = VGG16( num_class=15 )
-#criterion = nn.CrossEntropyLoss()
+criterion = nn.CrossEntropyLoss()
 '''
 https://discuss.pytorch.org/t/runtimeerror-multi-target-not-supported-newbie/10216
 
@@ -96,7 +99,8 @@ The input is expected to contain scores for each class.
 input has to be a 2D Tensor of size (minibatch, C).
 This criterion expects a class index (0 to C-1) as the target for each value of a 1D tensor of size minibatch
 '''
-criterion = nn.BCELoss()
+
+#criterion = nn.BCELoss()
 
 optimizer=torch.optim.Adam(model.parameters(), lr=5e-5)
 

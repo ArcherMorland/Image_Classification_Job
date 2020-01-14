@@ -64,6 +64,11 @@ class VGG16(nn.Module):
         x=self.classifier(x)
         return x
 
+
+
+
+
+'''
     def _initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -76,7 +81,7 @@ class VGG16(nn.Module):
                 m.bias.data.zero_()
             elif isinstance(m, nn.Linear):
                 m.weight.data.normal_(0, 0.01)
-                m.bias.data.zero_()
+                m.bias.data.zero_()'''
 
 
 

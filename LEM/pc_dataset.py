@@ -8,6 +8,7 @@ import torch.utils.data as data
 import torch
 import torch.utils.data as data
 import torchvision
+from torchvision import transforms, datasets
 
 
 
@@ -76,12 +77,11 @@ class ImageData(data.Dataset):
             
         batch_labels_ls=torch.nn.functional.one_hot(batch_labels, num_classes=self.num_classes).tolist()  
         batch_labels_ft= torch.FloatTensor(batch_labels_ls)
-        
         #print("batch_classname:",batch_classname)
         return [batch_imgs, batch_labels_ft, batch_classname]
     
 
-def get_TraVal(Augment=True, size=0.2, stratify='target', refresh=False):
+def get_TraVal(Augment=True, size=0.2, stratify='target', refresh=False, target_onehot=True):
     global Train_root, Valid_root, ImgH, ImgW
 
     if not os.path.exists( os.path.join('..','valid') ):
@@ -101,7 +101,7 @@ def get_TraVal(Augment=True, size=0.2, stratify='target', refresh=False):
 
         #https://pytorch.org/docs/stable/torchvision/transforms.html
 
-        transform_options = torchvision.transforms.Compose([
+        transforms_options = torchvision.transforms.Compose([
 
             torchvision.transforms.Resize(size=(ImgH, ImgW), interpolation=2),#(h, w)
             #https://pytorch.org/docs/master/torchvision/transforms.html
@@ -117,40 +117,53 @@ def get_TraVal(Augment=True, size=0.2, stratify='target', refresh=False):
             ])
 
     else:
-        transform_options = torchvision.transforms.Compose([
+        transforms_options = torchvision.transforms.Compose([
             torchvision.transforms.Resize(size=(ImgH, ImgW), interpolation=2),#(h, w)
             torchvision.transforms.ToTensor(),
             ])
 
 
     #train_dataset=torchvision.datasets.ImageFolder( root=Train_root, transform=transform_options)
-    train_dataset=ImageData(torchvision.datasets.ImageFolder( root=Train_root, transform=transform_options) )
-    valid_dataset=ImageData(torchvision.datasets.ImageFolder( root=Valid_root, transform=torchvision.transforms.Compose([ 
-                                                                                                                         torchvision.transforms.Resize(size=(ImgH, ImgW), interpolation=2),#(h, w) 
-                                                                                                                         torchvision.transforms.ToTensor(),])  ))
-                                                  
+    if target_onehot:
+        train_dataset=ImageData(torchvision.datasets.ImageFolder( root=Train_root, transform=transforms_options) )
+        valid_dataset=ImageData(torchvision.datasets.ImageFolder( root=Valid_root, transform=transforms.Compose([ transforms.Resize(size=(ImgH, ImgW), interpolation=2),#(h, w) 
+                                                                                                                  transforms.ToTensor(),]) ))
 
 
-    #train_dataset.samples: check image path  #https://www.itread01.com/content/1542309028.html
-    #train_dataset.class_to_idx: check class indice  #https://discuss.pytorch.org/t/how-to-know-which-image-is-at-what-index-in-torchvision-datasets-imagefolder/20808
-    #print(train_dataset.class_to_idx)
-    #print(valid_dataset.class_to_idx)
-    
-    train_loader=data.DataLoader(
+        train_loader=data.DataLoader(
         dataset=train_dataset,
         batch_size=32,
         num_workers=4,
         shuffle=True,
-        collate_fn=train_dataset.collate_fn
-        )
+        collate_fn=train_dataset.collate_fn  )
 
-    val_loader=data.DataLoader(
+        val_loader=data.DataLoader(
         dataset=valid_dataset,
         batch_size=32,
         num_workers=4,
         shuffle=False,
-        collate_fn=valid_dataset.collate_fn
+        collate_fn=valid_dataset.collate_fn  )                                 
+    else:
+        train_dataset=torchvision.datasets.ImageFolder( root=Train_root, transform=transforms_options)
+        valid_dataset=torchvision.datasets.ImageFolder( root=Valid_root, transform=transforms.Compose([ transforms.Resize(size=(ImgH, ImgW), interpolation=2),#(h, w) 
+                                                                                                        transforms.ToTensor(),]) )
+        #train_dataset.samples: check image path  #https://www.itread01.com/content/1542309028.html
+        #train_dataset.class_to_idx: check class indice  #https://discuss.pytorch.org/t/how-to-know-which-image-is-at-what-index-in-torchvision-datasets-imagefolder/20808
+        train_loader=data.DataLoader(
+        dataset=train_dataset,
+        batch_size=32,
+        num_workers=4,
+        shuffle=True,
         )
+
+        val_loader=data.DataLoader(
+        dataset=valid_dataset,
+        batch_size=32,
+        num_workers=4,
+        shuffle=False,
+        )        
+    
+    
     #return train_dataset,valid_dataset
     return train_loader, val_loader
 
