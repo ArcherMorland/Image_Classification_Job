@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import math
 
+#https://blog.csdn.net/qq_41940950/article/details/98658677
 
 class VGG16(nn.Module):
     def __init__(self, num_class=1000):
@@ -55,7 +56,7 @@ class VGG16(nn.Module):
             nn.Linear(4096, num_class)
         )
 
-        #self._initialize_weights()
+        
 
 
     def forward(self, x):
@@ -65,23 +66,10 @@ class VGG16(nn.Module):
         return x
 
 
+class ResNet50(nn.Module):
+    def __init__(self, num_class):
 
 
-
-'''
-    def _initialize_weights(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2. / n))
-                if m.bias is not None:
-                    m.bias.data.zero_()
-            elif isinstance(m, nn.BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()
-            elif isinstance(m, nn.Linear):
-                m.weight.data.normal_(0, 0.01)
-                m.bias.data.zero_()'''
 
 
 
