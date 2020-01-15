@@ -65,10 +65,11 @@ class VGG16(nn.Module):
         x=self.classifier(x)
         return x
 
-
+#https://blog.csdn.net/lyl771857509/article/details/84175874
+'''
 class ResNet50(nn.Module):
     def __init__(self, num_class):
-
+'''
 
 
 
