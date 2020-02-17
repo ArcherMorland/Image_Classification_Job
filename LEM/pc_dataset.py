@@ -4,9 +4,6 @@ import glob
 
 import torch
 import torch.utils.data as data
-
-import torch
-import torch.utils.data as data
 import torchvision
 from torchvision import transforms, datasets
 
