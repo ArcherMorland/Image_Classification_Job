@@ -4,6 +4,9 @@ import glob
 
 import torch
 import torch.utils.data as data
+
+import torch
+import torch.utils.data as data
 import torchvision
 from torchvision import transforms, datasets
 
@@ -15,8 +18,8 @@ from torchvision import transforms, datasets
 Train_root=os.path.join('..','train')
 Valid_root=os.path.join('..','valid')
 
-ImgH=224  
-ImgW=224 
+ImgH=416#224  
+ImgW=416#224 
 
 def return_all():
     global Valid_root
@@ -53,6 +56,7 @@ class ImageData(data.Dataset):
         return len(self.data)
 
     def __getitem__(self, index):
+        #print("__getitem__(self, index):   ", index)
         return self.data[index]
    
     def collate_fn(self, datas):
@@ -60,6 +64,7 @@ class ImageData(data.Dataset):
         batch_imgs=None
         batch_labels=None
         batch_classname=[]
+        #print("cp; datas[index]:   ", datas[0])
         for i, data in enumerate(datas):
              
             batch_classname.extend([cname for cname, idx in self.class_to_index.items() if idx == data[1]])
@@ -129,14 +134,14 @@ def get_TraVal(Augment=True, size=0.2, stratify='target', refresh=False, target_
 
         train_loader=data.DataLoader(
         dataset=train_dataset,
-        batch_size=32,
+        batch_size=8,
         num_workers=4,
-        shuffle=True,
+        shuffle=False,
         collate_fn=train_dataset.collate_fn  )
 
         val_loader=data.DataLoader(
         dataset=valid_dataset,
-        batch_size=32,
+        batch_size=8,
         num_workers=4,
         shuffle=False,
         collate_fn=valid_dataset.collate_fn  )                                 
@@ -148,14 +153,14 @@ def get_TraVal(Augment=True, size=0.2, stratify='target', refresh=False, target_
         #train_dataset.class_to_idx: check class indice  #https://discuss.pytorch.org/t/how-to-know-which-image-is-at-what-index-in-torchvision-datasets-imagefolder/20808
         train_loader=data.DataLoader(
         dataset=train_dataset,
-        batch_size=32,
+        batch_size=8,
         num_workers=4,
         shuffle=True,
         )
 
         val_loader=data.DataLoader(
         dataset=valid_dataset,
-        batch_size=32,
+        batch_size=8,
         num_workers=4,
         shuffle=False,
         )        

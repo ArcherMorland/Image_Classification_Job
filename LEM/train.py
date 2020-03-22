@@ -1,6 +1,6 @@
 import pc_dataset as PC_Dataset
 from pc_dataset import get_TraVal, return_all
-from networks import VGG16
+from networks import VGG16, Darknet_Feature_Extractor
 
 import os, time, json
 
@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 #A small tool for evaluating processing time of a function
 def FunctionTimer(f,args):    
@@ -63,8 +64,8 @@ def _run_learning(training=True,epoch=0):
     for batch_idx, ( data, target) in enumerate(dataloader):
         #print(data.shape)#torch.Size([32, 3, 220, 330])
 
-        batch_data=data.to(device)
-        batch_label=target.to(device)
+        batch_data=Variable(data.to(device))
+        batch_label=Variable(target.to(device), requires_grad=False)
         
         prediction = model(batch_data)
 
@@ -116,8 +117,8 @@ def _run_learning(training=True,epoch=0):
 
 
 
-
-model = VGG16( num_class=15 )
+model_def_path=os.path.join('.','Configuration','models','Darknet_FE.cfg')
+model = Darknet_Feature_Extractor(config_path=model_def_path, num_class=15)#VGG16( num_class=15 )
 #https://www.okcode.net/article/87118
 criterion = nn.CrossEntropyLoss()
 '''
